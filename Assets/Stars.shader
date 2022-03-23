@@ -38,7 +38,7 @@ Shader "Unlit/Stars" {
 
                 float4 starPosition = _StarsBuffer[instanceID].position;
 
-                float4 worldPosition = (v.vertex * 0.5f) + starPosition.x;
+                float4 worldPosition = (v.vertex * 0.5f) + starPosition;
 
                 o.vertex = UnityObjectToClipPos(worldPosition);
                 o.uv = v.uv;
