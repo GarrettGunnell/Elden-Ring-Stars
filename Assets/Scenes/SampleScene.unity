@@ -246,6 +246,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b0b50e7d05befc54fb32783d807f18b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  starDensity: 100
+  radius: 10
+  starMaterial: {fileID: 2100000, guid: c576b520441b1574584b11526ef2e360, type: 2}
+  starMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!4 &941015888
 Transform:
   m_ObjectHideFlags: 0

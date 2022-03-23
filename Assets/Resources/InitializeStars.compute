@@ -1,8 +1,15 @@
 #pragma kernel InitializeStars
 
-RWStructuredBuffer<float4> _Stars;
+struct StarData {
+    float4 position;
+};
+
+RWStructuredBuffer<StarData> _Stars;
 
 [numthreads(256,1,1)]
 void InitializeStars(uint3 id : SV_DispatchThreadID) {
-    _Stars[id.x] = id.x;
+    StarData star;
+    star.position = float4(id.x, 0, 0, 0);
+
+    _Stars[id.x] = star;
 }

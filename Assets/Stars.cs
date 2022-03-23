@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using static System.Runtime.InteropServices.Marshal;
 using UnityEngine;
 
 public class Stars : MonoBehaviour {
@@ -14,9 +15,13 @@ public class Stars : MonoBehaviour {
     
     private Bounds bounds;
 
+    private struct StarData {
+        public Vector4 position;
+    }
+
     void Start() {
         initializeStarsShader = Resources.Load<ComputeShader>("InitializeStars");
-        starsBuffer = new ComputeBuffer(starDensity, 4 * 4);
+        starsBuffer = new ComputeBuffer(starDensity, SizeOf(typeof(StarData)));
         argsBuffer = new ComputeBuffer(1, 5 * sizeof(uint), ComputeBufferType.IndirectArguments);
 
         initializeStarsShader.SetBuffer(0, "_Stars", starsBuffer);
@@ -31,10 +36,17 @@ public class Stars : MonoBehaviour {
 
         bounds = new Bounds(Vector3.zero, new Vector3(-500.0f, 200.0f, 500.0f));
 
-        starMaterial.SetBuffer("_StarBuffer", starsBuffer);
+        starMaterial.SetBuffer("_StarsBuffer", starsBuffer);
     }
 
     void Update() {
         Graphics.DrawMeshInstancedIndirect(starMesh, 0, starMaterial, bounds, argsBuffer);    
+    }
+
+    void OnDisable() {
+        starsBuffer.Release();
+        argsBuffer.Release();
+        starsBuffer = null;
+        argsBuffer = null;
     }
 }

@@ -1,57 +1,55 @@
-Shader "Unlit/Stars"
-{
-    Properties
-    {
-        _MainTex ("Texture", 2D) = "white" {}
+Shader "Unlit/Stars" {
+    Properties {
+        
     }
-    SubShader
-    {
-        Tags { "RenderType"="Opaque" }
-        LOD 100
 
-        Pass
-        {
+    SubShader {
+        Pass {
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
-            // make fog work
-            #pragma multi_compile_fog
+            
+            #pragma target 4.5
 
-            #include "UnityCG.cginc"
+            #include "UnityPBSLighting.cginc"
+            #include "AutoLight.cginc"
+            #include "/Resources/Random.cginc"
 
-            struct appdata
-            {
+            struct VertexData {
                 float4 vertex : POSITION;
                 float2 uv : TEXCOORD0;
             };
 
-            struct v2f
-            {
+            struct v2f {
                 float2 uv : TEXCOORD0;
-                UNITY_FOG_COORDS(1)
                 float4 vertex : SV_POSITION;
             };
 
-            sampler2D _MainTex;
-            float4 _MainTex_ST;
+            struct StarData {
+                float4 position;
+            };
 
-            v2f vert (appdata v)
-            {
+            StructuredBuffer<StarData> _StarsBuffer;
+            
+            v2f vert(VertexData v, uint instanceID : SV_INSTANCEID) {
                 v2f o;
-                o.vertex = UnityObjectToClipPos(v.vertex);
-                o.uv = TRANSFORM_TEX(v.uv, _MainTex);
-                UNITY_TRANSFER_FOG(o,o.vertex);
+
+                float hash = randValue(instanceID);
+
+                float4 starPosition = _StarsBuffer[instanceID].position;
+
+                float4 worldPosition = (v.vertex * 0.5f) + starPosition.x;
+
+                o.vertex = UnityObjectToClipPos(worldPosition);
+                o.uv = v.uv;
+                
                 return o;
             }
 
-            fixed4 frag (v2f i) : SV_Target
-            {
-                // sample the texture
-                fixed4 col = tex2D(_MainTex, i.uv);
-                // apply fog
-                UNITY_APPLY_FOG(i.fogCoord, col);
-                return col;
+            fixed4 frag(v2f i) : SV_Target {
+                return 1.0f;
             }
+
             ENDCG
         }
     }
