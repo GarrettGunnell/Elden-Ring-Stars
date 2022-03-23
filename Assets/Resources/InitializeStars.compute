@@ -9,6 +9,7 @@ struct StarData {
 };
 
 RWStructuredBuffer<StarData> _Stars;
+float _Radius;
 
 [numthreads(256,1,1)]
 void InitializeStars(uint3 id : SV_DispatchThreadID) {
@@ -24,11 +25,12 @@ void InitializeStars(uint3 id : SV_DispatchThreadID) {
     float sinPhi = sin(phi);
     float cosPhi = cos(phi);
 
-    float x = r * sinPhi * cosTheta * 50.0f;
-    float y = r * sinPhi * sinTheta * 50.0f;
-    float z = r * cosPhi * 50.0f;
+    float x = r * sinPhi * cosTheta;
+    float y = r * sinPhi * sinTheta;
+    float z = r * cosPhi;
 
     star.position = float4(x, y, z, 1.0f);
-
+    star.position.xyz *= _Radius;
+    
     _Stars[id.x] = star;
 }

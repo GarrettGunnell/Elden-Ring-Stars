@@ -25,6 +25,7 @@ public class Stars : MonoBehaviour {
         argsBuffer = new ComputeBuffer(1, 5 * sizeof(uint), ComputeBufferType.IndirectArguments);
 
         initializeStarsShader.SetBuffer(0, "_Stars", starsBuffer);
+        initializeStarsShader.SetFloat("_Radius", radius);
         initializeStarsShader.Dispatch(0, Mathf.CeilToInt(starDensity / 256.0f), 1, 1);
 
         uint[] args = new uint[5] {0, 0, 0, 0, 0};
