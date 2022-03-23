@@ -1,0 +1,8 @@
+#pragma kernel InitializeStars
+
+RWStructuredBuffer<float4> _Stars;
+
+[numthreads(256,1,1)]
+void InitializeStars(uint3 id : SV_DispatchThreadID) {
+    _Stars[id.x] = id.x;
+}
