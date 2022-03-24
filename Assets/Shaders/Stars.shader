@@ -2,6 +2,7 @@ Shader "Unlit/Stars" {
     Properties {
         _MainTex ("Texture", 2D) = "white" {}
         [HDR] _Emission ("Emission", Color) = (0, 0, 0)
+        _EmissionDistanceModifier ("Emission Distance Modifier", Range(0.0, 1.0)) = 0.0
     }
 
     SubShader {
@@ -28,6 +29,7 @@ Shader "Unlit/Stars" {
                 float2 uv : TEXCOORD0;
                 float4 vertex : SV_POSITION;
                 float3 normal : TEXCOORD1;
+                float4 worldPos : TEXCOORD2;
             };
 
             struct StarData {
@@ -38,6 +40,7 @@ Shader "Unlit/Stars" {
             sampler2D _MainTex;
             float4 _MainTex_ST;
             float3 _Emission;
+            float _EmissionDistanceModifier;
 
             StructuredBuffer<StarData> _StarsBuffer;
             
@@ -63,6 +66,7 @@ Shader "Unlit/Stars" {
                 float4 worldPosition = localPosition + starPosition;
 
                 o.vertex = UnityObjectToClipPos(worldPosition);
+                o.worldPos = worldPosition;
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
                 o.normal = mul(_StarsBuffer[instanceID].rotation, normalize(v.normal));
                 
@@ -74,9 +78,14 @@ Shader "Unlit/Stars" {
                 float ndotl = DotClamped(i.normal, _WorldSpaceLightPos0.xyz) * 0.9f + 0.1f;
 
                 col *= ndotl;
-                col.rgb += _Emission;
 
-                return col;
+                float viewDistance = length(_WorldSpaceCameraPos - i.worldPos);
+                float emissionFactor = (_EmissionDistanceModifier / sqrt(log(2))) * viewDistance;
+                emissionFactor = exp2(-emissionFactor * emissionFactor);
+
+                float4 maxEmission = float4(col.rgb + _Emission, 1.0f);
+
+                return lerp(maxEmission, col, emissionFactor);
             }
 
             ENDCG
