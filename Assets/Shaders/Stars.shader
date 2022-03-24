@@ -41,15 +41,21 @@ Shader "Unlit/Stars" {
             
             v2f vert(VertexData v, uint instanceID : SV_INSTANCEID) {
                 v2f o;
-
-                float hash = randValue(instanceID);
-
-                float sizeMod = hash * 0.7f + 0.2f;
-
                 float4 starPosition = _StarsBuffer[instanceID].position;
 
+                // Modify size
                 float4 localPosition = v.vertex;
-                localPosition *= sizeMod;
+                localPosition *= randValue(instanceID) * 0.7f + 0.2f;
+
+                // Modify position
+                float xOffset = randValue(starPosition.x + localPosition.x) * 2.0f - 1.0f;
+                float yOffset = randValue(starPosition.y + localPosition.y) * 2.0f - 1.0f;
+                float zOffset = randValue(starPosition.z + localPosition.z) * 2.0f - 1.0f;
+
+                float3 offset = float3(xOffset, yOffset, zOffset) * 0.2f;
+                localPosition.xyz += offset;
+
+                // Rotate
                 localPosition = mul(_StarsBuffer[instanceID].rotation, localPosition);
 
                 float4 worldPosition = localPosition + starPosition;
