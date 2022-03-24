@@ -13,7 +13,7 @@ Shader "Unlit/Stars" {
 
             #include "UnityPBSLighting.cginc"
             #include "AutoLight.cginc"
-            #include "/Resources/Random.cginc"
+            #include "../Resources/Random.cginc"
 
             struct VertexData {
                 float4 vertex : POSITION;
