@@ -246,10 +246,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b0b50e7d05befc54fb32783d807f18b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  starDensity: 100
-  radius: 10
+  starDensity: 50000
+  radius: 250
   starMaterial: {fileID: 2100000, guid: c576b520441b1574584b11526ef2e360, type: 2}
-  starMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  starMesh: {fileID: 4068373912626513877, guid: 5c55d5e99218fae4e8dda2f07ff458be, type: 3}
 --- !u!4 &941015888
 Transform:
   m_ObjectHideFlags: 0
@@ -315,7 +315,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
+  near clip plane: 0.01
   far clip plane: 1000
   field of view: 60
   orthographic: 0
