@@ -17,12 +17,14 @@ Shader "Unlit/Stars" {
 
             struct VertexData {
                 float4 vertex : POSITION;
+                float3 normal : NORMAL;
                 float2 uv : TEXCOORD0;
             };
 
             struct v2f {
                 float2 uv : TEXCOORD0;
                 float4 vertex : SV_POSITION;
+                float3 normal : TEXCOORD1;
             };
 
             struct StarData {
@@ -42,12 +44,15 @@ Shader "Unlit/Stars" {
 
                 o.vertex = UnityObjectToClipPos(worldPosition);
                 o.uv = v.uv;
+                o.normal = normalize(v.normal);
                 
                 return o;
             }
 
             fixed4 frag(v2f i) : SV_Target {
-                return 1.0f;
+                float ndotl = DotClamped(i.normal, _WorldSpaceLightPos0.xyz);
+
+                return ndotl;
             }
 
             ENDCG
