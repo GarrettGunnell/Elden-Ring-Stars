@@ -1,6 +1,7 @@
 Shader "Unlit/Stars" {
     Properties {
         _MainTex ("Texture", 2D) = "white" {}
+        [HDR] _Emission ("Emission", Color) = (0, 0, 0)
     }
 
     SubShader {
@@ -36,6 +37,7 @@ Shader "Unlit/Stars" {
             
             sampler2D _MainTex;
             float4 _MainTex_ST;
+            float3 _Emission;
 
             StructuredBuffer<StarData> _StarsBuffer;
             
@@ -71,7 +73,10 @@ Shader "Unlit/Stars" {
                 float4 col = tex2D(_MainTex, i.uv);
                 float ndotl = DotClamped(i.normal, _WorldSpaceLightPos0.xyz) * 0.9f + 0.1f;
 
-                return col * ndotl;
+                col *= ndotl;
+                col.rgb += _Emission;
+
+                return col;
             }
 
             ENDCG
