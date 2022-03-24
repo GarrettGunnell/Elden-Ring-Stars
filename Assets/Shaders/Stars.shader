@@ -85,7 +85,7 @@ Shader "Unlit/Stars" {
 
                 float4 maxEmission = float4(col.rgb + _Emission, 1.0f);
 
-                return lerp(maxEmission, col, emissionFactor);
+                return lerp(maxEmission, col, emissionFactor * 0.9f);
             }
 
             ENDCG
