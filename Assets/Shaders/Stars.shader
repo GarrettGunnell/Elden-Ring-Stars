@@ -81,7 +81,7 @@ Shader "Unlit/Stars" {
 
                 float viewDistance = length(_WorldSpaceCameraPos - i.worldPos);
                 float emissionFactor = (_EmissionDistanceModifier / sqrt(log(2))) * viewDistance;
-                emissionFactor = exp2(-emissionFactor * emissionFactor);
+                emissionFactor = exp2(-emissionFactor);
 
                 float4 maxEmission = float4(col.rgb + _Emission, 1.0f);
 
