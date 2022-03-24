@@ -43,13 +43,29 @@ Shader "Unlit/Stars" {
 
                 float hash = randValue(instanceID);
 
+                float sizeMod = hash * 0.7f + 0.2f;
+
                 float4 starPosition = _StarsBuffer[instanceID].position;
 
-                float4 worldPosition = (v.vertex) + starPosition;
+                float yaw = randValue(starPosition.x);
+                float pitch = randValue(starPosition.y);
+                float roll = randValue(starPosition.z);
+
+                float3x3 rotationMat = {
+                    cos(yaw) * cos(pitch), cos(yaw) * sin(pitch) * sin(roll) - sin(yaw) * cos(roll), cos(yaw) * sin(pitch) * cos(roll) + sin(yaw) * sin(roll),
+                    sin(yaw) * cos(pitch), sin(yaw) * sin(pitch) * sin(roll) + cos(yaw) * cos(roll), sin(yaw) * sin(pitch) * cos(roll) - cos(yaw) * sin(roll),
+                    -sin(pitch), cos(pitch) * sin(roll), cos(pitch) * cos(roll)
+                };
+
+                float4 localPosition = v.vertex;
+                localPosition *= sizeMod;
+                localPosition.xyz = mul(rotationMat, localPosition.xyz);
+
+                float4 worldPosition = localPosition + starPosition;
 
                 o.vertex = UnityObjectToClipPos(worldPosition);
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
-                o.normal = normalize(v.normal);
+                o.normal = mul(rotationMat, normalize(v.normal));
                 
                 return o;
             }
