@@ -56,7 +56,7 @@ Shader "Unlit/Stars" {
 
             fixed4 frag(v2f i) : SV_Target {
                 float4 col = tex2D(_MainTex, i.uv);
-                float ndotl = DotClamped(i.normal, _WorldSpaceLightPos0.xyz);
+                float ndotl = DotClamped(i.normal, _WorldSpaceLightPos0.xyz) * 0.9f + 0.1f;
 
                 return col * ndotl;
             }
