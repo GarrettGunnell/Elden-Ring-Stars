@@ -15,6 +15,7 @@ float _Radius;
 void InitializeStars(uint3 id : SV_DispatchThreadID) {
     StarData star;
 
+    // Random spherical coordinates method from: https://karthikkaranth.me/blog/generating-random-points-in-a-sphere/
     float u = randValue(id.x + 12345) * 2.0f - 1.0f;
     float v = randValue(id.x + 54321) * 2.0f - 1.0f;
     float theta = u * 2.0f * PI;

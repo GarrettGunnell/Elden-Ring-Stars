@@ -1,9 +1,11 @@
 Shader "Unlit/Stars" {
     Properties {
-        
+        _MainTex ("Texture", 2D) = "white" {}
     }
 
     SubShader {
+        Zwrite On
+
         Pass {
             CGPROGRAM
             #pragma vertex vert
@@ -30,6 +32,9 @@ Shader "Unlit/Stars" {
             struct StarData {
                 float4 position;
             };
+            
+            sampler2D _MainTex;
+            float4 _MainTex_ST;
 
             StructuredBuffer<StarData> _StarsBuffer;
             
@@ -43,16 +48,17 @@ Shader "Unlit/Stars" {
                 float4 worldPosition = (v.vertex) + starPosition;
 
                 o.vertex = UnityObjectToClipPos(worldPosition);
-                o.uv = v.uv;
+                o.uv = TRANSFORM_TEX(v.uv, _MainTex);
                 o.normal = normalize(v.normal);
                 
                 return o;
             }
 
             fixed4 frag(v2f i) : SV_Target {
+                float4 col = tex2D(_MainTex, i.uv);
                 float ndotl = DotClamped(i.normal, _WorldSpaceLightPos0.xyz);
 
-                return ndotl;
+                return col * ndotl;
             }
 
             ENDCG
