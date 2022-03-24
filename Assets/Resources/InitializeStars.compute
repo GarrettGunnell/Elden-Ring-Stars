@@ -6,6 +6,7 @@
 
 struct StarData {
     float4 position;
+    float4x4 rotation;
 };
 
 RWStructuredBuffer<StarData> _Stars;
@@ -32,6 +33,19 @@ void InitializeStars(uint3 id : SV_DispatchThreadID) {
 
     star.position = float4(x, y, z, 1.0f);
     star.position.xyz *= _Radius;
+
+    float yaw = randValue(star.position.x);
+    float pitch = randValue(star.position.y);
+    float roll = randValue(star.position.z);
+
+    float4x4 rotationMat = {
+        cos(yaw) * cos(pitch), cos(yaw) * sin(pitch) * sin(roll) - sin(yaw) * cos(roll), cos(yaw) * sin(pitch) * cos(roll) + sin(yaw) * sin(roll), 0,
+        sin(yaw) * cos(pitch), sin(yaw) * sin(pitch) * sin(roll) + cos(yaw) * cos(roll), sin(yaw) * sin(pitch) * cos(roll) - cos(yaw) * sin(roll), 0,
+        -sin(pitch), cos(pitch) * sin(roll), cos(pitch) * cos(roll), 0,
+        0, 0, 0, 1
+    };
+
+    star.rotation = rotationMat;
     
     _Stars[id.x] = star;
 }

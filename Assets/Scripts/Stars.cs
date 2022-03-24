@@ -17,6 +17,7 @@ public class Stars : MonoBehaviour {
 
     private struct StarData {
         public Vector4 position;
+        public Matrix4x4 rotation;
     }
 
     void Start() {
