@@ -72,8 +72,10 @@ Shader "Hidden/Bloom" {
             #pragma vertex vp 
             #pragma fragment fp
 
+            float _DownDelta;
+
             float4 fp(v2f i) : SV_TARGET {
-                return float4(SampleBox(i.uv, 1.0f), 1.0f);
+                return float4(SampleBox(i.uv, _DownDelta), 1.0f);
             }
             ENDCG
         }
@@ -86,8 +88,10 @@ Shader "Hidden/Bloom" {
             #pragma vertex vp 
             #pragma fragment fp
 
+            float _UpDelta;
+
             float4 fp(v2f i) : SV_TARGET {
-                return float4(SampleBox(i.uv, 0.5f), 1.0f);
+                return float4(SampleBox(i.uv, _UpDelta), 1.0f);
             }
             ENDCG
         }

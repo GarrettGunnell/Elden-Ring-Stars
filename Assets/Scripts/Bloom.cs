@@ -14,6 +14,12 @@ public class Bloom : MonoBehaviour {
     [Range(1, 16)]
     public int downSamples = 1;
 
+    [Range(0.01f, 2.0f)]
+    public float downSampleDelta = 1.0f;
+
+    [Range(0.01f, 2.0f)]
+    public float upSampleDelta = 0.5f;
+
     [Range(0.0f, 10.0f)]
     public float bloomIntensity = 1;
 
@@ -28,6 +34,8 @@ public class Bloom : MonoBehaviour {
     void OnRenderImage(RenderTexture source, RenderTexture destination) {
         bloomMat.SetFloat("_Threshold", threshold);
         bloomMat.SetFloat("_SoftThreshold", softThreshold);
+        bloomMat.SetFloat("_DownDelta", downSampleDelta);
+        bloomMat.SetFloat("_UpDelta", upSampleDelta);
         bloomMat.SetTexture("_OriginalTex", source);
         bloomMat.SetFloat("_Intensity", bloomIntensity);
 

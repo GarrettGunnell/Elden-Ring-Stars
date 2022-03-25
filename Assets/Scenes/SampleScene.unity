@@ -246,7 +246,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b0b50e7d05befc54fb32783d807f18b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  starDensity: 50000
+  starDensity: 40000
   radius: 250
   starMaterial: {fileID: 2100000, guid: c576b520441b1574584b11526ef2e360, type: 2}
   starMesh: {fileID: 4068373912626513877, guid: 5c55d5e99218fae4e8dda2f07ff458be, type: 3}
@@ -423,6 +423,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bloomShader: {fileID: 4800000, guid: f3dc389f482b75b418578616119ab1b9, type: 3}
   threshold: 0.8
-  softThreshold: 0.85
-  downSamples: 6
+  softThreshold: 0.9
+  downSamples: 4
+  downSampleDelta: 1
+  upSampleDelta: 1
   bloomIntensity: 0.35
