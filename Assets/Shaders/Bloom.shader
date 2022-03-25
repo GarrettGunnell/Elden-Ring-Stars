@@ -99,10 +99,11 @@ Shader "Hidden/Bloom" {
             #pragma fragment fp
 
             sampler2D _OriginalTex;
+            float _Intensity;
 
             float4 fp(v2f i) : SV_TARGET {
                 float4 col = tex2D(_OriginalTex, i.uv);
-                col.rgb += SampleBox(i.uv, 0.5f);
+                col.rgb +=  pow(_Intensity * pow(SampleBox(i.uv, 0.5f), 1.0f / 2.2f), 2.2f);
 
                 return col;
             }

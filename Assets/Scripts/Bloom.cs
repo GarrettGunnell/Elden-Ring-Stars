@@ -14,6 +14,9 @@ public class Bloom : MonoBehaviour {
     [Range(1, 16)]
     public int downSamples = 1;
 
+    [Range(0.0f, 10.0f)]
+    public float bloomIntensity = 1;
+
     private Material bloomMat;
 
     void Start() {
@@ -26,6 +29,7 @@ public class Bloom : MonoBehaviour {
         bloomMat.SetFloat("_Threshold", threshold);
         bloomMat.SetFloat("_SoftThreshold", softThreshold);
         bloomMat.SetTexture("_OriginalTex", source);
+        bloomMat.SetFloat("_Intensity", bloomIntensity);
 
         int width = source.width / 2;
         int height = source.height / 2;
