@@ -9,6 +9,7 @@ Shader "Hidden/Bloom" {
             #include "UnityCG.cginc"
 
             sampler2D _MainTex;
+            float2 _MainTex_TexelSize;
 
             struct VertexData {
                 float4 vertex : POSITION;
@@ -28,6 +29,52 @@ Shader "Hidden/Bloom" {
             }
         ENDCG
 
+        // Box Downsample
+        Pass {
+            CGPROGRAM
+            #pragma vertex vp 
+            #pragma fragment fp
+
+            float3 Sample(float2 uv) {
+                return tex2D(_MainTex, uv).rgb;
+            }
+
+            float3 SampleBox(float2 uv, float delta) {
+                float4 o = _MainTex_TexelSize.xyxy * float2(-delta, delta).xxyy;
+                float3 s = Sample(uv + o.xy) + Sample(uv + o.zy) + Sample(uv + o.xw) + Sample(uv + o.zw);
+
+                return s * 0.25f;
+            }
+
+            float4 fp(v2f i) : SV_TARGET {
+                return float4(SampleBox(i.uv, 1.0f), 1.0f);
+            }
+            ENDCG
+        }
+
+        // Box Upsample
+        Pass {
+            CGPROGRAM
+            #pragma vertex vp 
+            #pragma fragment fp
+
+            float3 Sample(float2 uv) {
+                return tex2D(_MainTex, uv).rgb;
+            }
+
+            float3 SampleBox(float2 uv, float delta) {
+                float4 o = _MainTex_TexelSize.xyxy * float2(-delta, delta).xxyy;
+                float3 s = Sample(uv + o.xy) + Sample(uv + o.zy) + Sample(uv + o.xw) + Sample(uv + o.zw);
+
+                return s * 0.25f;
+            }
+
+            float4 fp(v2f i) : SV_TARGET {
+                return float4(SampleBox(i.uv, 0.5f), 1.0f);
+            }
+            ENDCG
+        }
+/*
         // Filter Pixels
         Pass {
             CGPROGRAM
@@ -50,67 +97,6 @@ Shader "Hidden/Bloom" {
                 return col * contribution;
             }
             ENDCG
-        }
-
-        // Box Blur Pass 1
-        Pass {
-            CGPROGRAM
-            #pragma vertex vp
-            #pragma fragment fp
-
-            float2 _MainTex_TexelSize;
-            int _KernelSize;
-            float _BlurSpread;
-
-            #define TWO_PI  6.28319
-            #define E       2.71828
-
-
-
-            float gaussian(int x, int y) {
-                float sigmaSqu = _BlurSpread * _BlurSpread;
-                return (1.0f / sqrt(TWO_PI * sigmaSqu)) * pow(E, -((x * x) + (y * y)) / (2.0f * sigmaSqu));
-            }
-
-            float4 fp(v2f i) : SV_Target {
-                float3 col;
-                float kernelSum;
-
-                int upper = ((_KernelSize - 1) / 2);
-                int lower = -upper;
-
-                for (int x = lower; x <= upper; ++x) {
-                    for (int y = lower; y <= upper; ++y) {
-                        float gauss = gaussian(x, y);
-                        kernelSum += gauss;
-
-                        fixed2 offset = fixed2(_MainTex_TexelSize.x * x, _MainTex_TexelSize.y * y);
-                        col += gauss * tex2D(_MainTex, i.uv + offset).rgb;
-                    }
-                }
-
-                col /= kernelSum;
-
-                return float4(col, 1.0f);
-            }
-            ENDCG
-        }
-
-        // Additive Pass
-        Pass {
-            CGPROGRAM
-            #pragma vertex vp
-            #pragma fragment fp
-
-            sampler2D _OriginalTex;
-
-            float4 fp(v2f i) : SV_Target {
-                float4 col = tex2D(_MainTex, i.uv);
-                float4 originalCol = tex2D(_OriginalTex, i.uv);
-
-                return col + originalCol;
-            }
-            ENDCG
-        }
+        }*/
     }
 }

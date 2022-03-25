@@ -11,11 +11,8 @@ public class Bloom : MonoBehaviour {
     [Range(0.0f, 1.0f)]
     public float softThreshold = 0.5f;
 
-    [Range(1, 10)]
-    public int blurKernelSize = 3;
-    
-    [Range(1.0f, 50.0f)]
-    public float blurSpread = 5;
+    [Range(1, 16)]
+    public int downSamples = 1;
 
     private Material bloomMat;
 
@@ -24,26 +21,43 @@ public class Bloom : MonoBehaviour {
         bloomMat.hideFlags = HideFlags.HideAndDontSave;
     }
 
+    // Bloom logic largely adapted from: https://catlikecoding.com/unity/tutorials/advanced-rendering/bloom/
     void OnRenderImage(RenderTexture source, RenderTexture destination) {
         bloomMat.SetFloat("_Threshold", threshold);
         bloomMat.SetFloat("_SoftThreshold", softThreshold);
-        bloomMat.SetInt("_KernelSize", blurKernelSize);
-        bloomMat.SetFloat("_BlurSpread", blurSpread);
-        bloomMat.SetTexture("_OriginalTex", source);
 
-        RenderTexture luminanceTarget = RenderTexture.GetTemporary(source.width, source.height, 0, source.format);
-        Graphics.Blit(source, luminanceTarget, bloomMat, 0);
+        int width = source.width / 2;
+        int height = source.height / 2;
 
-        RenderTexture blurTarget = RenderTexture.GetTemporary(source.width, source.height, 0, source.format);
-        Graphics.Blit(luminanceTarget, blurTarget, bloomMat, 1);
+        RenderTexture[] textures = new RenderTexture[16];
 
-        RenderTexture blurTarget2 = RenderTexture.GetTemporary(source.width, source.height, 0, source.format);
-        Graphics.Blit(blurTarget, blurTarget2, bloomMat, 1);
+        RenderTexture currentDestination = textures[0] = RenderTexture.GetTemporary(width, height, 0, source.format);
 
-        RenderTexture.ReleaseTemporary(luminanceTarget);
-        RenderTexture.ReleaseTemporary(blurTarget);
-        RenderTexture.ReleaseTemporary(blurTarget2);
-        
-        Graphics.Blit(blurTarget, destination, bloomMat, 2);
+        Graphics.Blit(source, currentDestination, bloomMat, 0);
+        RenderTexture currentSource = currentDestination;
+
+        int i = 1;
+        for (; i < downSamples; ++i) {
+            width /= 2;
+            height /= 2;
+
+            if (height < 2)
+                break;
+
+            currentDestination = textures[i] = RenderTexture.GetTemporary(width, height, 0, source.format);
+            Graphics.Blit(currentSource, currentDestination, bloomMat, 0);
+            currentSource = currentDestination;
+        }
+
+        for (i -= 2; i >= 0; --i) {
+            currentDestination = textures[i];
+            textures[i] = null;
+            Graphics.Blit(currentSource, currentDestination, bloomMat, 1);
+            RenderTexture.ReleaseTemporary(currentSource);
+            currentSource = currentDestination;
+        }
+
+        Graphics.Blit(currentSource, destination, bloomMat, 1);
+        RenderTexture.ReleaseTemporary(currentSource);
     }
 }
