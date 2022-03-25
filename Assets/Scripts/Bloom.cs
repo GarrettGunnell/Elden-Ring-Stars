@@ -21,6 +21,12 @@ public class Bloom : MonoBehaviour {
     void OnRenderImage(RenderTexture source, RenderTexture destination) {
         bloomMat.SetFloat("_Threshold", threshold);
         bloomMat.SetFloat("_SoftThreshold", softThreshold);
-        Graphics.Blit(source, destination, bloomMat);
+
+        RenderTexture bloomTargets = RenderTexture.GetTemporary(source.width, source.height, 0, source.format);
+        Graphics.Blit(source, bloomTargets, bloomMat, 0);
+
+        RenderTexture.ReleaseTemporary(bloomTargets);
+        
+        Graphics.Blit(bloomTargets, destination);
     }
 }

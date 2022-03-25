@@ -7,13 +7,10 @@ Shader "Hidden/Bloom" {
 
     SubShader {
 
-        // Filter Pixels
-        Pass {
-            CGPROGRAM
-            #pragma vertex vp
-            #pragma fragment fp
-
+        CGINCLUDE
             #include "UnityCG.cginc"
+
+            sampler2D _MainTex;
 
             struct VertexData {
                 float4 vertex : POSITION;
@@ -31,8 +28,14 @@ Shader "Hidden/Bloom" {
                 o.uv = v.uv;
                 return o;
             }
+        ENDCG
 
-            sampler2D _MainTex;
+        // Filter Pixels
+        Pass {
+            CGPROGRAM
+            #pragma vertex vp
+            #pragma fragment fp
+
             float _Threshold, _SoftThreshold;
 
             fixed4 fp(v2f i) : SV_Target {
@@ -51,6 +54,28 @@ Shader "Hidden/Bloom" {
             ENDCG
         }
 
+        // Box Blur
+        Pass {
+            CGPROGRAM
+            #pragma vertex vp
+            #pragma fragment fp
 
+            float _Threshold, _SoftThreshold;
+
+            fixed4 fp(v2f i) : SV_Target {
+                fixed4 col = tex2D(_MainTex, i.uv);
+
+                half brightness = max(col.r, max(col.g, col.b));
+                half knee = _Threshold * _SoftThreshold;
+                half soft = brightness - _Threshold + knee;
+                soft = clamp(soft, 0, 2 * knee);
+                soft = soft * soft / (4 * knee * 0.00001);
+                half contribution = max(soft, brightness - _Threshold);
+                contribution /= max(contribution, 0.00001);
+
+                return col * contribution;
+            }
+            ENDCG
+        }
     }
 }
