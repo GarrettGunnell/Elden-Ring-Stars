@@ -13,6 +13,9 @@ public class Bloom : MonoBehaviour {
 
     [Range(1, 10)]
     public int blurKernelSize = 3;
+    
+    [Range(1.0f, 50.0f)]
+    public float blurSpread = 5;
 
     private Material bloomMat;
 
@@ -25,20 +28,22 @@ public class Bloom : MonoBehaviour {
         bloomMat.SetFloat("_Threshold", threshold);
         bloomMat.SetFloat("_SoftThreshold", softThreshold);
         bloomMat.SetInt("_KernelSize", blurKernelSize);
+        bloomMat.SetFloat("_BlurSpread", blurSpread);
+        bloomMat.SetTexture("_OriginalTex", source);
 
-        RenderTexture bloomTargets = RenderTexture.GetTemporary(source.width, source.height, 0, source.format);
-        Graphics.Blit(source, bloomTargets, bloomMat, 0);
+        RenderTexture luminanceTarget = RenderTexture.GetTemporary(source.width, source.height, 0, source.format);
+        Graphics.Blit(source, luminanceTarget, bloomMat, 0);
 
-        RenderTexture blurTarget1 = RenderTexture.GetTemporary(source.width, source.height, 0, source.format);
-        Graphics.Blit(bloomTargets, blurTarget1, bloomMat, 1);
+        RenderTexture blurTarget = RenderTexture.GetTemporary(source.width, source.height, 0, source.format);
+        Graphics.Blit(luminanceTarget, blurTarget, bloomMat, 1);
 
         RenderTexture blurTarget2 = RenderTexture.GetTemporary(source.width, source.height, 0, source.format);
-        Graphics.Blit(blurTarget1, blurTarget2, bloomMat, 2);
+        Graphics.Blit(blurTarget, blurTarget2, bloomMat, 1);
 
-        RenderTexture.ReleaseTemporary(bloomTargets);
-        RenderTexture.ReleaseTemporary(blurTarget1);
+        RenderTexture.ReleaseTemporary(luminanceTarget);
+        RenderTexture.ReleaseTemporary(blurTarget);
         RenderTexture.ReleaseTemporary(blurTarget2);
         
-        Graphics.Blit(blurTarget2, destination);
+        Graphics.Blit(blurTarget, destination, bloomMat, 2);
     }
 }

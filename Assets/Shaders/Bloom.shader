@@ -36,8 +36,8 @@ Shader "Hidden/Bloom" {
 
             float _Threshold, _SoftThreshold;
 
-            fixed4 fp(v2f i) : SV_Target {
-                fixed4 col = tex2D(_MainTex, i.uv);
+            float4 fp(v2f i) : SV_Target {
+                float4 col = tex2D(_MainTex, i.uv);
 
                 half brightness = max(col.r, max(col.g, col.b));
                 half knee = _Threshold * _SoftThreshold;
@@ -60,50 +60,55 @@ Shader "Hidden/Bloom" {
 
             float2 _MainTex_TexelSize;
             int _KernelSize;
+            float _BlurSpread;
 
-            fixed4 fp(v2f i) : SV_Target {
-                fixed4 col = tex2D(_MainTex, i.uv);
+            #define TWO_PI  6.28319
+            #define E       2.71828
 
-                fixed3 sum;
+
+
+            float gaussian(int x, int y) {
+                float sigmaSqu = _BlurSpread * _BlurSpread;
+                return (1.0f / sqrt(TWO_PI * sigmaSqu)) * pow(E, -((x * x) + (y * y)) / (2.0f * sigmaSqu));
+            }
+
+            float4 fp(v2f i) : SV_Target {
+                float3 col;
+                float kernelSum;
 
                 int upper = ((_KernelSize - 1) / 2);
                 int lower = -upper;
 
                 for (int x = lower; x <= upper; ++x) {
-                    sum += tex2D(_MainTex, i.uv + fixed2(_MainTex_TexelSize.x * x, 0.0f));
+                    for (int y = lower; y <= upper; ++y) {
+                        float gauss = gaussian(x, y);
+                        kernelSum += gauss;
+
+                        fixed2 offset = fixed2(_MainTex_TexelSize.x * x, _MainTex_TexelSize.y * y);
+                        col += gauss * tex2D(_MainTex, i.uv + offset).rgb;
+                    }
                 }
 
-                sum /= (float)_KernelSize;
+                col /= kernelSum;
 
-                return fixed4(sum, 1.0f);
+                return float4(col, 1.0f);
             }
             ENDCG
         }
 
-        // Box Blur Pass 2
+        // Additive Pass
         Pass {
             CGPROGRAM
             #pragma vertex vp
             #pragma fragment fp
 
-            float2 _MainTex_TexelSize;
-            int _KernelSize;
+            sampler2D _OriginalTex;
 
-            fixed4 fp(v2f i) : SV_Target {
-                fixed4 col = tex2D(_MainTex, i.uv);
+            float4 fp(v2f i) : SV_Target {
+                float4 col = tex2D(_MainTex, i.uv);
+                float4 originalCol = tex2D(_OriginalTex, i.uv);
 
-                fixed3 sum;
-
-                int upper = ((_KernelSize - 1) / 2);
-                int lower = -upper;
-
-                for (int y = lower; y <= upper; ++y) {
-                    sum += tex2D(_MainTex, i.uv + fixed2(0.0f, _MainTex_TexelSize.y * y));
-                }
-
-                sum /= (float)_KernelSize;
-
-                return fixed4(sum, 1.0f);
+                return col + originalCol;
             }
             ENDCG
         }
