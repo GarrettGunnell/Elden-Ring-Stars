@@ -25,6 +25,7 @@ public class Bloom : MonoBehaviour {
     void OnRenderImage(RenderTexture source, RenderTexture destination) {
         bloomMat.SetFloat("_Threshold", threshold);
         bloomMat.SetFloat("_SoftThreshold", softThreshold);
+        bloomMat.SetTexture("_OriginalTex", source);
 
         int width = source.width / 2;
         int height = source.height / 2;
@@ -45,19 +46,19 @@ public class Bloom : MonoBehaviour {
                 break;
 
             currentDestination = textures[i] = RenderTexture.GetTemporary(width, height, 0, source.format);
-            Graphics.Blit(currentSource, currentDestination, bloomMat, 0);
+            Graphics.Blit(currentSource, currentDestination, bloomMat, 1);
             currentSource = currentDestination;
         }
 
         for (i -= 2; i >= 0; --i) {
             currentDestination = textures[i];
             textures[i] = null;
-            Graphics.Blit(currentSource, currentDestination, bloomMat, 1);
+            Graphics.Blit(currentSource, currentDestination, bloomMat, 2);
             RenderTexture.ReleaseTemporary(currentSource);
             currentSource = currentDestination;
         }
 
-        Graphics.Blit(currentSource, destination, bloomMat, 1);
+        Graphics.Blit(currentSource, destination, bloomMat, 3);
         RenderTexture.ReleaseTemporary(currentSource);
     }
 }
