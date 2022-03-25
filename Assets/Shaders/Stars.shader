@@ -75,7 +75,7 @@ Shader "Unlit/Stars" {
 
             fixed4 frag(v2f i) : SV_Target {
                 float4 col = tex2D(_MainTex, i.uv);
-                float ndotl = DotClamped(i.normal, _WorldSpaceLightPos0.xyz) * 0.9f + 0.1f;
+                float ndotl = DotClamped(i.normal, _WorldSpaceLightPos0.xyz) * 0.5f + 0.5f;
 
                 col *= ndotl;
 
@@ -85,7 +85,7 @@ Shader "Unlit/Stars" {
 
                 float4 maxEmission = float4(col.rgb + _Emission, 1.0f);
 
-                return lerp(maxEmission, col, emissionFactor * 0.9f);
+                return lerp(maxEmission, col, emissionFactor * 0.95f);
             }
 
             ENDCG

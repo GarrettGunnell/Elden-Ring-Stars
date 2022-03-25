@@ -406,8 +406,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   postProcessingShader: {fileID: 4800000, guid: 20e809423f3c0a640a1c615aa4abdca2, type: 3}
   contrast: 1
-  brightness: 0
-  saturation: 1
+  brightness: -0.05
+  saturation: 1.1
   gamma: 2.2
 --- !u!114 &963194231
 MonoBehaviour:
@@ -423,6 +423,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bloomShader: {fileID: 4800000, guid: f3dc389f482b75b418578616119ab1b9, type: 3}
   threshold: 0.8
-  softThreshold: 0.75
-  downSamples: 8
-  bloomIntensity: 0.5
+  softThreshold: 0.85
+  downSamples: 6
+  bloomIntensity: 0.35
