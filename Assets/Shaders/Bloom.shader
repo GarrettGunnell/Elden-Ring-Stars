@@ -104,7 +104,7 @@ Shader "Hidden/Bloom" {
                 float4 col = tex2D(_OriginalTex, i.uv);
                 col.rgb += SampleBox(i.uv, 0.5f);
 
-                return float4(SampleBox(i.uv, 0.5f), 1.0f);
+                return col;
             }
             ENDCG
         }

@@ -424,4 +424,4 @@ MonoBehaviour:
   bloomShader: {fileID: 4800000, guid: f3dc389f482b75b418578616119ab1b9, type: 3}
   threshold: 1
   softThreshold: 0.5
-  downSamples: 1
+  downSamples: 8
