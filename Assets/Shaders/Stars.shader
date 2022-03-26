@@ -3,6 +3,8 @@ Shader "Unlit/Stars" {
         _MainTex ("Texture", 2D) = "white" {}
         [HDR] _Emission ("Emission", Color) = (0, 0, 0)
         _EmissionDistanceModifier ("Emission Distance Modifier", Range(0.0, 1.0)) = 0.0
+        _MinEmissionMod ("Minimum Emission Modifier", Range(0.0, 1.0)) = 0.0
+        _MaxEmissionMod ("Maximum Emission Modifier", Range(0.0, 1.0)) = 1.0
         _MinSize ("Minimum Size", Range(0.0, 1.0)) = 0.0
         _MaxSize ("Maximum Size", Range(0.0, 2.0)) = 1.0
         _MaxOffset ("Maximum Positional Offset", Range(0.0, 1.0)) = 0.0
@@ -33,6 +35,7 @@ Shader "Unlit/Stars" {
                 float4 vertex : SV_POSITION;
                 float3 normal : TEXCOORD1;
                 float4 worldPos : TEXCOORD2;
+                float emissionMod : TEXCOORD3;
             };
 
             struct StarData {
@@ -45,6 +48,7 @@ Shader "Unlit/Stars" {
             float3 _Emission;
             float _EmissionDistanceModifier;
             float _MinSize, _MaxSize;
+            float _MinEmissionMod, _MaxEmissionMod;
             float _MaxOffset;
 
             StructuredBuffer<StarData> _StarsBuffer;
@@ -75,6 +79,7 @@ Shader "Unlit/Stars" {
                 o.worldPos = worldPosition;
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
                 o.normal = mul(_StarsBuffer[instanceID].rotation, normalize(v.normal));
+                o.emissionMod = lerp(_MinEmissionMod, _MaxEmissionMod, randValue(instanceID));
                 
                 return o;
             }
@@ -89,7 +94,7 @@ Shader "Unlit/Stars" {
                 float emissionFactor = (_EmissionDistanceModifier / sqrt(log(2))) * viewDistance;
                 emissionFactor = exp2(-emissionFactor);
 
-                float4 maxEmission = float4(col.rgb + _Emission, 1.0f);
+                float4 maxEmission = float4(col.rgb + (_Emission - i.emissionMod), 1.0f);
 
                 return lerp(maxEmission, col, emissionFactor * 0.95f);
             }
