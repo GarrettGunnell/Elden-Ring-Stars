@@ -3,6 +3,8 @@ Shader "Unlit/Stars" {
         _MainTex ("Texture", 2D) = "white" {}
         [HDR] _Emission ("Emission", Color) = (0, 0, 0)
         _EmissionDistanceModifier ("Emission Distance Modifier", Range(0.0, 1.0)) = 0.0
+        _MinSize ("Minimum Size", Range(0.0, 1.0)) = 0.0
+        _MaxSize ("Maximum Size", Range(0.0, 2.0)) = 1.0
     }
 
     SubShader {
@@ -41,6 +43,7 @@ Shader "Unlit/Stars" {
             float4 _MainTex_ST;
             float3 _Emission;
             float _EmissionDistanceModifier;
+            float _MinSize, _MaxSize;
 
             StructuredBuffer<StarData> _StarsBuffer;
             
@@ -50,14 +53,15 @@ Shader "Unlit/Stars" {
 
                 // Modify size
                 float4 localPosition = v.vertex;
-                localPosition *= randValue(instanceID) * 0.7f + 0.2f;
+                float sizeMod = lerp(_MinSize, _MaxSize, randValue(instanceID));
+                localPosition *= sizeMod;
 
                 // Modify position
-                float xOffset = randValue(starPosition.x + localPosition.x) * 2.0f - 1.0f;
-                float yOffset = randValue(starPosition.y + localPosition.y) * 2.0f - 1.0f;
-                float zOffset = randValue(starPosition.z + localPosition.z) * 2.0f - 1.0f;
+                float xOffset = lerp(-0.1, 0.1, randValue(starPosition.x + localPosition.x));
+                float yOffset = lerp(-0.1, 0.1, randValue(starPosition.y + localPosition.y));
+                float zOffset = lerp(-0.1, 0.1, randValue(starPosition.z + localPosition.z));
 
-                float3 offset = float3(xOffset, yOffset, zOffset) * 0.2f;
+                float3 offset = float3(xOffset, yOffset, zOffset);
                 localPosition.xyz += offset;
 
                 // Rotate
