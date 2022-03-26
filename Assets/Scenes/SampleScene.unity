@@ -426,5 +426,5 @@ MonoBehaviour:
   softThreshold: 0.9
   downSamples: 4
   downSampleDelta: 1
-  upSampleDelta: 0.5
-  bloomIntensity: 0.35
+  upSampleDelta: 1
+  bloomIntensity: 0.5

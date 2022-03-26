@@ -5,6 +5,7 @@ Shader "Unlit/Stars" {
         _EmissionDistanceModifier ("Emission Distance Modifier", Range(0.0, 1.0)) = 0.0
         _MinSize ("Minimum Size", Range(0.0, 1.0)) = 0.0
         _MaxSize ("Maximum Size", Range(0.0, 2.0)) = 1.0
+        _MaxOffset ("Maximum Positional Offset", Range(0.0, 1.0)) = 0.0
     }
 
     SubShader {
@@ -44,6 +45,7 @@ Shader "Unlit/Stars" {
             float3 _Emission;
             float _EmissionDistanceModifier;
             float _MinSize, _MaxSize;
+            float _MaxOffset;
 
             StructuredBuffer<StarData> _StarsBuffer;
             
@@ -57,9 +59,9 @@ Shader "Unlit/Stars" {
                 localPosition *= sizeMod;
 
                 // Modify position
-                float xOffset = lerp(-0.1, 0.1, randValue(starPosition.x + localPosition.x));
-                float yOffset = lerp(-0.1, 0.1, randValue(starPosition.y + localPosition.y));
-                float zOffset = lerp(-0.1, 0.1, randValue(starPosition.z + localPosition.z));
+                float xOffset = lerp(-_MaxOffset, _MaxOffset, randValue(starPosition.x + localPosition.x));
+                float yOffset = lerp(-_MaxOffset, _MaxOffset, randValue(starPosition.y + localPosition.y));
+                float zOffset = lerp(-_MaxOffset, _MaxOffset, randValue(starPosition.z + localPosition.z));
 
                 float3 offset = float3(xOffset, yOffset, zOffset);
                 localPosition.xyz += offset;
