@@ -34,9 +34,9 @@ void InitializeStars(uint3 id : SV_DispatchThreadID) {
     star.position = float4(x, y, z, 1.0f);
     star.position.xyz *= _Radius;
 
-    float yaw = randValue(star.position.x);
-    float pitch = randValue(star.position.y);
-    float roll = randValue(star.position.z);
+    float yaw = randValue(star.position.x) * 2.0f * PI;
+    float pitch = randValue(star.position.y) * 2.0f * PI;
+    float roll = randValue(star.position.z) * 2.0f * PI;
 
     float4x4 rotationMat = {
         cos(yaw) * cos(pitch), cos(yaw) * sin(pitch) * sin(roll) - sin(yaw) * cos(roll), cos(yaw) * sin(pitch) * cos(roll) + sin(yaw) * sin(roll), 0,
