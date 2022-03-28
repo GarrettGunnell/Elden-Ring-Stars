@@ -62,6 +62,9 @@ Shader "Unlit/Stars" {
                 float sizeMod = lerp(_MinSize, _MaxSize, randValue(instanceID));
                 localPosition *= sizeMod;
 
+                // Rotate
+                localPosition = mul(_StarsBuffer[instanceID].rotation, localPosition);
+
                 // Modify position
                 float xOffset = lerp(-_MaxOffset, _MaxOffset, randValue(starPosition.x + localPosition.x));
                 float yOffset = lerp(-_MaxOffset, _MaxOffset, randValue(starPosition.y + localPosition.y));
@@ -69,9 +72,6 @@ Shader "Unlit/Stars" {
 
                 float3 offset = float3(xOffset, yOffset, zOffset);
                 localPosition.xyz += offset;
-
-                // Rotate
-                localPosition = mul(_StarsBuffer[instanceID].rotation, localPosition);
 
                 float4 worldPosition = localPosition + starPosition;
 

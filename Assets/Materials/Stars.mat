@@ -66,8 +66,8 @@ Material:
     - _Glossiness: 0.5
     - _GlossyReflections: 1
     - _MaxEmissionMod: 0.25
-    - _MaxOffset: 0.1
-    - _MaxSize: 0.95
+    - _MaxOffset: 0.227
+    - _MaxSize: 0.64
     - _Metallic: 0
     - _MinEmissionMod: 0
     - _MinOffset: 0
